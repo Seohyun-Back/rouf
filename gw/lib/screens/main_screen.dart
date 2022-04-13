@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'package:gw/screens/friend_request.dart';
 
-//import '../globals.dart' as globals;
+import '../../globals.dart' as globals;
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -56,7 +56,9 @@ class _MainScreenState extends State<MainScreen> {
     User user = await _authentication.currentUser!;
     final _userData =
         await FirebaseFirestore.instance.collection('user').doc(user.uid).get();
-
+    globals.currentUsername = _userData.data()!['userName'];
+    globals.currentUid = _userData.data()!['userUID'];
+    globals.currentEmail = _userData.data()!['email'];
     return _userData.data()!['userName'];
   }
 
@@ -72,7 +74,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(50.0), // AppBar 사이즈 지정
         child: AppBar(

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gw/config/palette.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:gw/main_screen.dart';
+import 'package:gw/screens/main_screen.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gw/globals.dart' as globals;
 
 class LoginSignupScreen extends StatefulWidget {
   const LoginSignupScreen({Key? key}) : super(key: key);
@@ -21,6 +22,8 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
   String userName = '';
   String userEmail = '';
   String userPassword = '';
+  late List<String> friends;
+  late List<String> requests;
 
   void _tryValidation() {
     final isValid = _formKey.currentState!.validate();
@@ -454,10 +457,14 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                   .collection('user')
                                   .doc(newUser.user!.uid)
                                   .set({
+                                'userUID': newUser.user!.uid,
                                 'userName': userName,
-                                'email': userEmail
+                                'email': userEmail,
+                                //'friends': null,
+                                //'requests': null,
                               });
 
+                              //globals.currentUsername = userName;
                               if (newUser.user != null) {
                                 Navigator.push(
                                   context,
@@ -470,9 +477,6 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                 });
                               }
                             } catch (e) {
-                              setState(() {
-                                showSpinner = false;
-                              });
                               print(e);
                               if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -493,6 +497,8 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                 email: userEmail,
                                 password: userPassword,
                               );
+                              //globals.currentUsername = userName;
+                              //print(globals.currentUsername);
                               if (newUser.user != null) {
                                 // Navigator.push(
                                 //   context,
@@ -547,4 +553,3 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
     );
   }
 }
-//
