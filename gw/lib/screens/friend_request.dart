@@ -155,6 +155,21 @@ class _FriendRequestState extends State<FriendRequest> {
                                 'email': docs[index]['email'],
                               });
 
+                              globals.friendEmail =
+                                  docs[index]['email']; //2 email
+
+                              globals.friendUid = docs[index]['uid']; //2 uid
+
+                              FirebaseFirestore.instance
+                                  .collection(
+                                      'user/${globals.friendUid}/friends')
+                                  .doc(globals.currentEmail) //1 email
+                                  .set({
+                                'uid': globals.currentUid,
+                                'name': globals.currentUsername,
+                                'email': globals.currentEmail,
+                              });
+
                               FirebaseFirestore.instance
                                   .collection(
                                       'user/${globals.currentUid}/requests')

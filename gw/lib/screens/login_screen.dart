@@ -511,9 +511,6 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                 });
                               }
                             } catch (e) {
-                              setState(() {
-                                showSpinner = false;
-                              });
                               print(e);
                             }
                           }
