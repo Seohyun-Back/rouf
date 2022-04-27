@@ -40,6 +40,7 @@ dependencies:
   flutterfire_ui: ^0.3.6+1
   google_sign_in: ^5.2.4
   modal_progress_hud_nsn: ^0.1.0-nullsafety-1
+  date_utils: ^0.2.0
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +68,15 @@ flutter:
     - images/logo.png
     - images/profile.jpg
     - images/profileo.png
+    - images/loginlogo.jpg
+    - images/TaskIcon/공부.png
+    - images/TaskIcon/운동.png
+    - images/TaskIcon/놀기.png
+    - images/TaskIcon/잠자기.png
+    - images/TaskIcon/이동.png
+    - images/TaskIcon/일하기.png
+    - images/TaskIcon/밥먹기.png
+    - images/TaskIcon/직접 추가.png
   fonts:
     - family: rouf-font
       fonts:

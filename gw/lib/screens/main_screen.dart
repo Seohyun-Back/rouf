@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'package:gw/screens/friend_request.dart';
+import 'package:gw/screens/monthly.dart';
 
 import '../../globals.dart' as globals;
 
@@ -15,6 +16,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final _authentication = FirebaseAuth.instance;
+  DateTime selectedDate = DateTime.now();
+  List<String> listOfDays = ["월", "화", "수", "목", "금", "토", "일"];
 
   User? loggedUser;
   //DocumentSnapshot<Map<String, dynamic>>? userData;
@@ -28,24 +31,8 @@ class _MainScreenState extends State<MainScreen> {
   void getCurrentUser() async {
     try {
       User user = await _authentication.currentUser!;
-      // print("****************************");
-      // print("user 정보 가져오기 : ");
-      // print(user);
-      // final _userData = await FirebaseFirestore.instance
-      //     .collection('user')
-      //     .doc(user.uid)
-      //     .get();
-      // print("user data 가져오기");
-      // print(_userData);
-      // print("****************************");
       if (user != null) {
         loggedUser = user;
-        //userData = _userData;
-        //print(userData.get(['userName'])!);
-        //print(loggedUser!.userName);
-        //print(loggedUser!.email);
-        //userName = _userData.data()!['userName'];
-        // print(userName);
       }
     } catch (e) {
       print(e);
@@ -62,13 +49,95 @@ class _MainScreenState extends State<MainScreen> {
     return _userData.data()!['userName'];
   }
 
+  Widget tapableDate() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) {
+            return MonthlyWork();
+          }),
+        );
+      },
+      child: Row(
+        children: [
+          Icon(
+            Icons.arrow_back_ios_rounded,
+            color: Colors.black,
+            size: 16,
+          ),
+          Text(
+            selectedDate.year.toString() +
+                "/" +
+                selectedDate.month.toString() +
+                "/" +
+                selectedDate.day.toString() +
+                " (" +
+                listOfDays[selectedDate.weekday - 1] +
+                ")",
+            style: TextStyle(fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void addCategory(context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("할 일 추가",
+              style: TextStyle(
+                fontSize: 14,
+              )),
+          //content: new Text("Alert Dialog body"),
+          content: Container(
+              child: Column(
+            children: [
+              Container(
+                  child: Row(children: [
+                for (int i = 0; i < 4; i++)
+                  Column(
+                    children: [
+                      IconButton(
+                        icon: Image.asset(
+                            'images/TaskIcon/${globals.tasks[i]}.png'),
+                        iconSize: 20,
+                        onPressed: () {},
+                      ),
+                      Text(
+                        globals.tasks[i], //"공부",
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+              ])),
+              Row(
+                children: [],
+              )
+            ],
+          )),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<String> getUserEmail() async {
     User user = await _authentication.currentUser!;
     final _userData =
         await FirebaseFirestore.instance.collection('user').doc(user.uid).get();
 
     return await loggedUser!.email.toString();
-    //return _userData.data()!['Email'];
   }
 
   @override
@@ -79,34 +148,14 @@ class _MainScreenState extends State<MainScreen> {
         preferredSize: Size.fromHeight(50.0), // AppBar 사이즈 지정
         child: AppBar(
           backgroundColor: Colors.white, // AppBar 색상 지정
-          //title: Text('Main Screen', style: TextStyle(color: Colors.black)),
           leading: Image.asset(
             'images/logo.png',
-            //fit: BoxFit.contain,
             height: 50,
           ),
           iconTheme: IconThemeData(color: Color.fromARGB(255, 32, 32, 32)),
           elevation: 0.0,
 
           centerTitle: true,
-          // actions: [
-          //   IconButton(
-          //       icon: Icon(Icons.menu),
-          //       color: Colors.black,
-          //       onPressed: () {
-          //         print('menu button is clicked');
-          //       }),
-          //   // 로그아웃 버튼. 일단 두고 나중에 옮기자
-          //   // IconButton(
-          //   //   icon: Icon(
-          //   //     Icons.exit_to_app_sharp,
-          //   //     color: Colors.black,
-          //   //   ),
-          //   //   onPressed: () {
-          //   //     FirebaseAuth.instance.signOut();
-          //   //   },
-          //   // )
-          // ],
         ),
       ),
       endDrawer: Drawer(
@@ -146,7 +195,6 @@ class _MainScreenState extends State<MainScreen> {
                                   return Text(
                                     snapshot.data.toString(),
                                     style: TextStyle(
-                                      //color: Colors.white,
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -183,22 +231,6 @@ class _MainScreenState extends State<MainScreen> {
                     bottomRight: Radius.circular(20.0),
                   )),
             ),
-            // UserAccountsDrawerHeader(
-            //   currentAccountPicture: CircleAvatar(
-            //     backgroundImage: AssetImage('assets/images/profile1.jpg'),
-            //   ),
-            //   accountName: Text('noweeh'),
-            //   accountEmail: Text('leehw1011@gmail.com'),
-            //   onDetailsPressed: () {
-            //     print('arrow is clicked');
-            //   },
-            //   decoration: BoxDecoration(
-            //       color: Colors.green[200],
-            //       borderRadius: BorderRadius.only(
-            //         bottomLeft: Radius.circular(20.0),
-            //         bottomRight: Radius.circular(20.0),
-            //       )),
-            // ),
             ListTile(
               leading: Icon(
                 Icons.favorite,
@@ -214,7 +246,6 @@ class _MainScreenState extends State<MainScreen> {
                   }),
                 );
               },
-              trailing: Icon(Icons.add),
             ),
             ListTile(
               leading: Icon(
@@ -225,7 +256,6 @@ class _MainScreenState extends State<MainScreen> {
               onTap: () {
                 print("Setting is clicked");
               },
-              trailing: Icon(Icons.add),
             ),
             ListTile(
               leading: Icon(
@@ -235,23 +265,42 @@ class _MainScreenState extends State<MainScreen> {
               title: Text('로그아웃'),
               onTap: () {
                 FirebaseAuth.instance.signOut();
-                //_authentication.signOut();
-                // Navigator.pop(context);
-                // Navigator.pop(context);
                 print("Logout is clicked");
               },
-              trailing: Icon(Icons.add),
             ),
           ],
         ),
       ),
-      body: Center(
-        child: Text(
-          'Main Screen',
-          style: TextStyle(
-              fontFamily: "rouf", fontSize: 24, fontWeight: FontWeight.bold),
-        ),
+      body: Container(
+        padding: EdgeInsets.fromLTRB(10, 5, 0, 0),
+        child: Column(children: [
+          tapableDate(),
+          const SizedBox(
+            height: 10,
+          ),
+          Container(
+            height: 220,
+            width: 330,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.black,
+              ),
+            ),
+            child: const Text('친구 상태창'),
+          ),
+          Text(
+            "See",
+          ),
+        ]),
       ),
+      floatingActionButton: FloatingActionButton(
+          elevation: 0.0,
+          child: new Icon(Icons.add),
+          onPressed: () {
+            addCategory(context);
+          }),
+      // //BUTTON LOCATION
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
