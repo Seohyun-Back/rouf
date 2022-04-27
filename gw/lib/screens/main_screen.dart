@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
+import 'package:gw/component/add_task.dart';
 import 'package:gw/screens/friend_request.dart';
 import 'package:gw/screens/monthly.dart';
 
@@ -95,38 +96,61 @@ class _MainScreenState extends State<MainScreen> {
           //content: new Text("Alert Dialog body"),
           content: Container(
               child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                   child: Row(children: [
                 for (int i = 0; i < 4; i++)
-                  Column(
-                    children: [
-                      IconButton(
-                        icon: Image.asset(
-                            'images/TaskIcon/${globals.tasks[i]}.png'),
-                        iconSize: 20,
-                        onPressed: () {},
-                      ),
-                      Text(
-                        globals.tasks[i], //"공부",
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Column(
+                      children: [
+                        IconButton(
+                          icon: Image.asset(
+                              'images/TaskIcon/${globals.tasks[i]}.png'),
+                          iconSize: 20,
+                          onPressed: () {
+                            globals.statusKey = i;
+                            print(globals.statusKey);
+                            //new AddTask();
+                          },
+                        ),
+                        Text(
+                          globals.tasks[i],
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
                   ),
               ])),
               Row(
-                children: [],
+                children: [
+                  for (int i = 4; i < 8; i++)
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Column(
+                        children: [
+                          IconButton(
+                            icon: Image.asset(
+                                'images/TaskIcon/${globals.tasks[i]}.png'),
+                            iconSize: 20,
+                            onPressed: () {
+                              globals.statusKey = i;
+                              print(globals.statusKey);
+                              //new AddTask();
+                            },
+                          ),
+                          Text(
+                            globals.tasks[i],
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
               )
             ],
           )),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text("Close"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
         );
       },
     );
@@ -264,6 +288,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
               title: Text('로그아웃'),
               onTap: () {
+                globals.statusKey = 8;
                 FirebaseAuth.instance.signOut();
                 print("Logout is clicked");
               },
@@ -289,7 +314,7 @@ class _MainScreenState extends State<MainScreen> {
             child: const Text('친구 상태창'),
           ),
           Text(
-            "See",
+            "See \n statusKey: ${globals.statusKey}",
           ),
         ]),
       ),

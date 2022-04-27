@@ -5,6 +5,8 @@ import 'package:gw/screens/main_screen.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:gw/globals.dart' as globals;
+
 class LoginSignupScreen extends StatefulWidget {
   const LoginSignupScreen({Key? key}) : super(key: key);
 
@@ -53,7 +55,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                   height: 300,
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: AssetImage('images/logo.png'),
+                          image: AssetImage('images/loginlogo.jpg'),
                           fit: BoxFit.fill)),
                   child: Container(
                     padding: EdgeInsets.only(top: 90, left: 20),
@@ -468,6 +470,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) {
+                                    globals.statusKey = 8;
                                     return MainScreen();
                                   }),
                                 );
@@ -491,6 +494,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                           if (!isSignupScreen) {
                             _tryValidation();
                             try {
+                              globals.statusKey = 8;
                               final newUser = await _authentication
                                   .signInWithEmailAndPassword(
                                 email: userEmail,
@@ -503,14 +507,12 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                 //     return MainScreen();
                                 //   }),
                                 // );
+
                                 setState(() {
                                   showSpinner = false;
                                 });
                               }
                             } catch (e) {
-                              setState(() {
-                                showSpinner = false;
-                              });
                               print(e);
                             }
                           }
