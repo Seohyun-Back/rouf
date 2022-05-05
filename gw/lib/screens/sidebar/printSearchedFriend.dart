@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:gw/globals.dart' as globals;
 
-import '../config/palette.dart';
+import '../../config/palette.dart';
 
 class printSearchedFriend extends StatefulWidget {
   const printSearchedFriend({Key? key}) : super(key: key);

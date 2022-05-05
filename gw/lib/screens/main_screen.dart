@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'package:gw/component/add_task.dart';
-import 'package:gw/screens/friend_request.dart';
+import 'package:gw/screens/sidebar/friend_request.dart';
 import 'package:gw/screens/monthly.dart';
 
 import '../../globals.dart' as globals;
@@ -83,75 +83,100 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  List<AddTask> dynamicList = <AddTask>[];
+
+  // addDynamic() {
+  //   dynamicList.add(new AddTask('${globals.tasks[globals.statusKey]}'));
+  // }
+
   void addCategory(context) {
+    BuildContext dialogContext;
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        //dialogContext = context;
         // return object of type Dialog
         return AlertDialog(
-          title: new Text("할 일 추가",
-              style: TextStyle(
-                fontSize: 14,
-              )),
-          //content: new Text("Alert Dialog body"),
-          content: Container(
-              child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+            title: new Text("할 일 추가",
+                style: TextStyle(
+                  fontSize: 14,
+                )),
+            //content: new Text("Alert Dialog body"),
+            //content:
+            actions: <Widget>[
               Container(
-                  child: Row(children: [
-                for (int i = 0; i < 4; i++)
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Column(
-                      children: [
-                        IconButton(
-                          icon: Image.asset(
-                              'images/TaskIcon/${globals.tasks[i]}.png'),
-                          iconSize: 20,
-                          onPressed: () {
-                            globals.statusKey = i;
-                            print(globals.statusKey);
-                            //new AddTask();
-                          },
-                        ),
-                        Text(
-                          globals.tasks[i],
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-              ])),
-              Row(
+                  child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  for (int i = 4; i < 8; i++)
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Column(
-                        children: [
-                          IconButton(
-                            icon: Image.asset(
-                                'images/TaskIcon/${globals.tasks[i]}.png'),
-                            iconSize: 20,
-                            onPressed: () {
-                              globals.statusKey = i;
-                              print(globals.statusKey);
-                              //new AddTask();
-                            },
-                          ),
-                          Text(
-                            globals.tasks[i],
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
+                  Container(
+                      child: Row(children: [
+                    for (int i = 0; i < 4; i++)
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Column(
+                          children: [
+                            IconButton(
+                              icon: Image.asset(
+                                  'images/TaskIcon/${globals.tasks[i]}.png'),
+                              iconSize: 20,
+                              onPressed: () {
+                                //Navigator.pop(dialogContext);
+
+                                globals.statusKey = i;
+                                print(globals.statusKey);
+
+                                setState(() {
+                                  dynamicList.clear();
+                                  dynamicList
+                                      .add(new AddTask(globals.tasks[i]));
+                                });
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            Text(
+                              globals.tasks[i],
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                  ])),
+                  Row(
+                    children: [
+                      for (int i = 4; i < 8; i++)
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Column(
+                            children: [
+                              IconButton(
+                                icon: Image.asset(
+                                    'images/TaskIcon/${globals.tasks[i]}.png'),
+                                iconSize: 20,
+                                onPressed: () {
+                                  //Navigator.pop(dialogContext);
+
+                                  globals.statusKey = i;
+                                  print(globals.statusKey);
+
+                                  setState(() {
+                                    dynamicList
+                                        .add(new AddTask(globals.tasks[i]));
+                                  });
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              Text(
+                                globals.tasks[i],
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  )
                 ],
-              )
-            ],
-          )),
-        );
+              )),
+            ]);
       },
     );
   }
@@ -167,6 +192,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(50.0), // AppBar 사이즈 지정
@@ -296,36 +322,90 @@ class _MainScreenState extends State<MainScreen> {
           ],
         ),
       ),
-      body: Container(
-        padding: EdgeInsets.fromLTRB(10, 5, 0, 0),
-        child: Column(children: [
-          tapableDate(),
-          const SizedBox(
-            height: 10,
-          ),
-          Container(
-            height: 220,
-            width: 330,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.black,
-              ),
-            ),
-            child: const Text('친구 상태창'),
-          ),
-          Text(
-            "See \n statusKey: ${globals.statusKey}",
-          ),
-        ]),
-      ),
       floatingActionButton: FloatingActionButton(
           elevation: 0.0,
           child: new Icon(Icons.add),
           onPressed: () {
             addCategory(context);
           }),
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.fromLTRB(10, 5, 0, 0),
+          // child: SingleChildScrollView(
+          //   scrollDirection: Axis.vertical,
+          child: Column(children: <Widget>[
+            tapableDate(),
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              height: 220,
+              width: 330,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.black,
+                ),
+              ),
+              child: const Text('친구 상태창'),
+            ),
+            Text(
+              "See \n statusKey: ${globals.statusKey} \n count: ${dynamicList.length} \n",
+            ),
+            Container(
+              height: 370,
+              //Task Window
+              // child: SingleChildScrollView(
+              //   scrollDirection: Axis.vertical,
+              child: ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemCount: 10,
+                  itemBuilder: (context, index) {
+                    return EventItem(title: 'My Event One', time: '01:24:17');
+                  }),
+            ),
+            // ),
+          ]),
+          // ),
+        ),
+      ),
+
       // //BUTTON LOCATION
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+}
+
+class EventItem extends StatelessWidget {
+  final String title;
+  final String time;
+
+  const EventItem({
+    Key? key,
+    required this.title,
+    required this.time,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Text(title),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.edit,
+              color: Colors.grey,
+              size: 20,
+            ),
+            SizedBox(height: 5),
+            Text(time),
+          ],
+        )
+      ]),
     );
   }
 }

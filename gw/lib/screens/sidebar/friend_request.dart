@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gw/screens/printSearchedFriend.dart';
+import 'package:gw/screens/sidebar/printSearchedFriend.dart';
 import 'package:gw/globals.dart' as globals;
 
-import '../config/palette.dart';
+import '../../config/palette.dart';
 
 class FriendRequest extends StatefulWidget {
   const FriendRequest({Key? key}) : super(key: key);
