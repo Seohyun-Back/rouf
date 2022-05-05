@@ -9,7 +9,7 @@ import 'package:gw/screens/monthly.dart';
 import '../../globals.dart' as globals;
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  MainScreen({Key? key}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -85,9 +85,9 @@ class _MainScreenState extends State<MainScreen> {
 
   List<AddTask> dynamicList = <AddTask>[];
 
-  // addDynamic() {
-  //   dynamicList.add(new AddTask('${globals.tasks[globals.statusKey]}'));
-  // }
+  addDynamic() {
+    dynamicList.add(new AddTask('${globals.tasks[globals.statusKey]}'));
+  }
 
   void addCategory(context) {
     BuildContext dialogContext;
@@ -188,6 +188,13 @@ class _MainScreenState extends State<MainScreen> {
 
     return await loggedUser!.email.toString();
   }
+
+  final List<Widget> timedEvents = [
+    EventItem(title: 'My Event 1', time: '01:24:17'),
+    EventItem(title: 'My Event 2', time: '01:24:18'),
+    EventItem(title: 'My Event 3', time: '01:24:19'),
+    EventItem(title: 'My Event 4', time: '01:24:20')
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -352,17 +359,15 @@ class _MainScreenState extends State<MainScreen> {
               "See \n statusKey: ${globals.statusKey} \n count: ${dynamicList.length} \n",
             ),
             Container(
-              height: 370,
               //Task Window
-              // child: SingleChildScrollView(
-              //   scrollDirection: Axis.vertical,
-              child: ListView.builder(
-                  scrollDirection: Axis.vertical,
+              height: 370,
+              padding: EdgeInsets.symmetric(vertical: 7),
+              child: ListView.separated(
                   shrinkWrap: true,
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                    return EventItem(title: 'My Event One', time: '01:24:17');
-                  }),
+                  separatorBuilder: (context, index) => Divider(),
+                  scrollDirection: Axis.vertical,
+                  itemCount: timedEvents.length,
+                  itemBuilder: (context, index) => timedEvents[index]),
             ),
             // ),
           ]),
@@ -389,7 +394,11 @@ class EventItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Text(title),
         Column(
