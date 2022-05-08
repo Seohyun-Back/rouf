@@ -2,14 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
-import 'package:gw/component/add_task.dart';
+import 'package:gw/models/timed_event.dart';
+import 'package:gw/models/timer_service.dart';
 import 'package:gw/screens/sidebar/friend_request.dart';
 import 'package:gw/screens/monthly.dart';
+import 'package:gw/widgets/event_item.dart';
+import 'package:gw/widgets/event_list.dart';
+import 'package:provider/provider.dart';
 
 import '../../globals.dart' as globals;
 
 class MainScreen extends StatefulWidget {
-  MainScreen({Key? key}) : super(key: key);
+  const MainScreen({Key? key}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -23,6 +27,8 @@ class _MainScreenState extends State<MainScreen> {
   User? loggedUser;
   //DocumentSnapshot<Map<String, dynamic>>? userData;
   String? userName;
+
+  get timerService => EventList();
 
   void initState() {
     super.initState();
@@ -48,6 +54,27 @@ class _MainScreenState extends State<MainScreen> {
     globals.currentUid = _userData.data()!['userUID'];
     globals.currentEmail = _userData.data()!['email'];
     return _userData.data()!['userName'];
+  }
+
+  Future<String> getUserEmail() async {
+    User user = await _authentication.currentUser!;
+    final _userData =
+        await FirebaseFirestore.instance.collection('user').doc(user.uid).get();
+
+    return await loggedUser!.email.toString();
+  }
+
+  Future<int> getFriendNum() async {
+    User user = await _authentication.currentUser!;
+    QuerySnapshot _myDoc = await FirebaseFirestore.instance
+        .collection('user')
+        .doc(user.uid)
+        .collection('friends')
+        .get();
+    List<DocumentSnapshot> _myDocCount = _myDoc.docs;
+    globals.friendNum = _myDocCount.length;
+    if (_myDocCount.length == 0) return 0;
+    return await _myDocCount.length;
   }
 
   Widget tapableDate() {
@@ -81,12 +108,6 @@ class _MainScreenState extends State<MainScreen> {
         ],
       ),
     );
-  }
-
-  List<AddTask> dynamicList = <AddTask>[];
-
-  addDynamic() {
-    dynamicList.add(new AddTask('${globals.tasks[globals.statusKey]}'));
   }
 
   void addCategory(context) {
@@ -124,13 +145,9 @@ class _MainScreenState extends State<MainScreen> {
 
                                 globals.statusKey = i;
                                 print(globals.statusKey);
-
-                                setState(() {
-                                  dynamicList.clear();
-                                  dynamicList
-                                      .add(new AddTask(globals.tasks[i]));
-                                });
                                 Navigator.of(context).pop();
+
+                                // timerService.save();
                               },
                             ),
                             Text(
@@ -158,10 +175,10 @@ class _MainScreenState extends State<MainScreen> {
                                   globals.statusKey = i;
                                   print(globals.statusKey);
 
-                                  setState(() {
-                                    dynamicList
-                                        .add(new AddTask(globals.tasks[i]));
-                                  });
+                                  // setState(() {
+                                  //   dynamicList
+                                  //       .add(new AddTask(globals.tasks[i]));
+                                  // });
                                   Navigator.of(context).pop();
                                 },
                               ),
@@ -180,21 +197,6 @@ class _MainScreenState extends State<MainScreen> {
       },
     );
   }
-
-  Future<String> getUserEmail() async {
-    User user = await _authentication.currentUser!;
-    final _userData =
-        await FirebaseFirestore.instance.collection('user').doc(user.uid).get();
-
-    return await loggedUser!.email.toString();
-  }
-
-  final List<Widget> timedEvents = [
-    EventItem(title: 'My Event 1', time: '01:24:17'),
-    EventItem(title: 'My Event 2', time: '01:24:18'),
-    EventItem(title: 'My Event 3', time: '01:24:19'),
-    EventItem(title: 'My Event 4', time: '01:24:20')
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -221,64 +223,93 @@ class _MainScreenState extends State<MainScreen> {
           children: <Widget>[
             DrawerHeader(
               child: Container(
-                  child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
                 children: [
-                  Expanded(
-                    flex: 2,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: AssetImage('images/profile.jpg'),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 8,
-                    child: Container(
-                      padding: EdgeInsets.fromLTRB(10, 25, 0, 0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          FutureBuilder(
-                              future: getUserName(),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot snapshot) {
-                                if (snapshot.hasData == false) {
-                                  return CircularProgressIndicator();
-                                } else if (snapshot.hasError) {
-                                  return Text(
-                                    'Error: ${snapshot.error}',
-                                  );
-                                } else {
-                                  return Text(
-                                    snapshot.data.toString(),
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ); //Text(snapshot.data.toString());
-                                }
-                              }),
-                          FutureBuilder(
-                              future: getUserEmail(),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot snapshot) {
-                                if (snapshot.hasData == false) {
-                                  return CircularProgressIndicator();
-                                } else if (snapshot.hasError) {
-                                  return Text(
-                                    'Error: ${snapshot.error}',
-                                  );
-                                } else {
-                                  return Text(snapshot.data.toString(),
-                                      style: TextStyle(
-                                          //color: Colors.white,
-                                          ));
-                                }
-                              }),
-                        ],
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundImage: AssetImage('images/profile.jpg'),
+                        ),
                       ),
-                    ),
-                  )
+                      Expanded(
+                        flex: 8,
+                        child: Container(
+                          padding: EdgeInsets.fromLTRB(10, 25, 0, 0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              FutureBuilder(
+                                  future: getUserName(),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot snapshot) {
+                                    if (snapshot.hasData == false) {
+                                      return CircularProgressIndicator();
+                                    } else if (snapshot.hasError) {
+                                      return Text(
+                                        'Error: ${snapshot.error}',
+                                      );
+                                    } else {
+                                      return Text(
+                                        snapshot.data.toString(),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ); //Text(snapshot.data.toString());
+                                    }
+                                  }),
+                              FutureBuilder(
+                                  future: getUserEmail(),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot snapshot) {
+                                    if (snapshot.hasData == false) {
+                                      return CircularProgressIndicator();
+                                    } else if (snapshot.hasError) {
+                                      return Text(
+                                        'Error: ${snapshot.error}',
+                                      );
+                                    } else {
+                                      return Text(snapshot.data.toString(),
+                                          style: TextStyle(
+                                              //color: Colors.white,
+                                              ));
+                                    }
+                                  }),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '친구 ',
+                          style: TextStyle(
+                              fontSize: 19, fontWeight: FontWeight.bold),
+                        ),
+                        FutureBuilder(
+                            future: getFriendNum(),
+                            builder:
+                                (BuildContext context, AsyncSnapshot snapshot) {
+                              if (snapshot.hasError) {
+                                return Text(
+                                  'Error: ${snapshot.error}',
+                                );
+                              } else {
+                                return Text(snapshot.data.toString(),
+                                    style: TextStyle(
+                                      fontSize: 19,
+                                      fontWeight: FontWeight.bold,
+                                    ));
+                              }
+                            }),
+                      ]),
                 ],
               )),
               decoration: BoxDecoration(
@@ -356,19 +387,9 @@ class _MainScreenState extends State<MainScreen> {
               child: const Text('친구 상태창'),
             ),
             Text(
-              "See \n statusKey: ${globals.statusKey} \n count: ${dynamicList.length} \n",
+              "See \n statusKey: ${globals.statusKey} \n count: \n",
             ),
-            Container(
-              //Task Window
-              height: 370,
-              padding: EdgeInsets.symmetric(vertical: 7),
-              child: ListView.separated(
-                  shrinkWrap: true,
-                  separatorBuilder: (context, index) => Divider(),
-                  scrollDirection: Axis.vertical,
-                  itemCount: timedEvents.length,
-                  itemBuilder: (context, index) => timedEvents[index]),
-            ),
+            // Provider(create: (context) => TimerService(), child: EventList()),
             // ),
           ]),
           // ),
@@ -377,44 +398,6 @@ class _MainScreenState extends State<MainScreen> {
 
       // //BUTTON LOCATION
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
-  }
-}
-
-class EventItem extends StatelessWidget {
-  final String title;
-  final String time;
-
-  const EventItem({
-    Key? key,
-    required this.title,
-    required this.time,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text(title),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.edit,
-              color: Colors.grey,
-              size: 20,
-            ),
-            SizedBox(height: 5),
-            Text(time),
-          ],
-        )
-      ]),
     );
   }
 }
