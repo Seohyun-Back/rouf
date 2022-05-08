@@ -285,31 +285,29 @@ class _MainScreenState extends State<MainScreen> {
                       )
                     ],
                   ),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '친구 ',
-                          style: TextStyle(
-                              fontSize: 19, fontWeight: FontWeight.bold),
-                        ),
-                        FutureBuilder(
-                            future: getFriendNum(),
-                            builder:
-                                (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.hasError) {
-                                return Text(
-                                  'Error: ${snapshot.error}',
-                                );
-                              } else {
-                                return Text(snapshot.data.toString(),
-                                    style: TextStyle(
-                                      fontSize: 19,
-                                      fontWeight: FontWeight.bold,
-                                    ));
-                              }
-                            }),
-                      ]),
+                  Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                    Text(
+                      '친구 ',
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                    FutureBuilder(
+                        future: getFriendNum(),
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.hasError) {
+                            return Text(
+                              'Error: ${snapshot.error}',
+                            );
+                          } else {
+                            return Text(snapshot.data.toString(),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ));
+                          }
+                        }),
+                  ]),
                 ],
               )),
               decoration: BoxDecoration(
