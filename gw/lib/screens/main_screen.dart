@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'package:gw/models/timed_event.dart';
 import 'package:gw/models/timer_service.dart';
+import 'package:gw/screens/sidebar/friend_list.dart';
 import 'package:gw/screens/sidebar/friend_request.dart';
 import 'package:gw/screens/monthly.dart';
 import 'package:gw/widgets/event_item.dart';
@@ -285,29 +286,42 @@ class _MainScreenState extends State<MainScreen> {
                       )
                     ],
                   ),
-                  Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                    Text(
-                      '친구 ',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    FutureBuilder(
-                        future: getFriendNum(),
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.hasError) {
-                            return Text(
-                              'Error: ${snapshot.error}',
-                            );
-                          } else {
-                            return Text(snapshot.data.toString(),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                ));
-                          }
+                  GestureDetector(
+                    onTap: () {
+                      print('Tapped Friend List!');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) {
+                          return FriendList();
                         }),
-                  ]),
+                      );
+                    },
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            '친구 ',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                          FutureBuilder(
+                              future: getFriendNum(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot snapshot) {
+                                if (snapshot.hasError) {
+                                  return Text(
+                                    'Error: ${snapshot.error}',
+                                  );
+                                } else {
+                                  return Text(snapshot.data.toString(),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                      ));
+                                }
+                              }),
+                        ]),
+                  ),
                 ],
               )),
               decoration: BoxDecoration(
