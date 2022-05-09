@@ -350,7 +350,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
               title: Text('로그아웃'),
               onTap: () {
-                globals.statusKey = 8;
+                globals.initGlobals();
                 FirebaseAuth.instance.signOut();
                 print("Logout is clicked");
               },
@@ -387,6 +387,7 @@ class _MainScreenState extends State<MainScreen> {
             Text(
               "See \n statusKey: ${globals.statusKey} \n count: \n",
             ),
+
             // Provider(create: (context) => TimerService(), child: EventList()),
             // ),
           ]),

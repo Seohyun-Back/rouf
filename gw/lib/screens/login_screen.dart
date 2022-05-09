@@ -24,14 +24,26 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
   String userName = '';
   String userEmail = '';
   String userPassword = '';
-  late List<String> friends;
-  late List<String> requests;
+  int statusKey = 8;
+  // late List<String> friends;
+  // late List<String> requests;
 
   void _tryValidation() {
     final isValid = _formKey.currentState!.validate();
     if (isValid) {
       _formKey.currentState!.save();
     }
+  }
+
+  Future<void> putGlobals() async {
+    final user = await _authentication.currentUser!;
+    final _userData =
+        await FirebaseFirestore.instance.collection('user').doc(user.uid).get();
+    globals.currentUsername = _userData.data()!['userName'];
+    globals.currentUid = _userData.data()!['userUID'];
+    globals.currentEmail = _userData.data()!['email'];
+    print(
+        'currentUsername: ${globals.currentUsername} \n currentUserUid: ${globals.currentUid} \n currentUserEmail: ${globals.currentEmail}');
   }
 
   @override
@@ -55,50 +67,50 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                   height: 300,
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: AssetImage('images/loginlogo.jpg'),
+                          image: AssetImage('images/loginlogo.png'),
                           fit: BoxFit.fill)),
-                  child: Container(
-                    padding: EdgeInsets.only(top: 90, left: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        RichText(
-                          text: TextSpan(
-                            text: 'welcome',
-                            style: TextStyle(
-                                letterSpacing: 1.0,
-                                fontSize: 25,
-                                color: Colors.white),
-                            children: [
-                              TextSpan(
-                                text: isSignupScreen
-                                    ? ' to Yummy chat!'
-                                    : ' back',
-                                style: TextStyle(
-                                  letterSpacing: 1.0,
-                                  fontSize: 25,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 5.0,
-                        ),
-                        Text(
-                          isSignupScreen
-                              ? 'Signup to continue'
-                              : 'Signin to continue',
-                          style: TextStyle(
-                            letterSpacing: 1.0,
-                            color: Colors.white,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
+                  // child: Container(
+                  //   padding: EdgeInsets.only(top: 90, left: 20),
+                  //   child: Column(
+                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                  //     children: [
+                  //       RichText(
+                  //         text: TextSpan(
+                  //           text: 'welcome',
+                  //           style: TextStyle(
+                  //               letterSpacing: 1.0,
+                  //               fontSize: 25,
+                  //               color: Colors.white),
+                  //           children: [
+                  //             TextSpan(
+                  //               text: isSignupScreen
+                  //                   ? ' to Yummy chat!'
+                  //                   : ' back',
+                  //               style: TextStyle(
+                  //                 letterSpacing: 1.0,
+                  //                 fontSize: 25,
+                  //                 color: Colors.white,
+                  //                 fontWeight: FontWeight.bold,
+                  //               ),
+                  //             )
+                  //           ],
+                  //         ),
+                  //       ),
+                  //       SizedBox(
+                  //         height: 5.0,
+                  //       ),
+                  //       Text(
+                  //         isSignupScreen
+                  //             ? 'Signup to continue'
+                  //             : 'Signin to continue',
+                  //         style: TextStyle(
+                  //           letterSpacing: 1.0,
+                  //           color: Colors.white,
+                  //         ),
+                  //       )
+                  //     ],
+                  //   ),
+                  // ),
                 ),
               ),
               // 텍스트 폼 필드
@@ -462,8 +474,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                 'userUID': newUser.user!.uid,
                                 'userName': userName,
                                 'email': userEmail,
-                                'friends': null,
-                                'requests': null,
+                                'statusKey': 8,
                               });
 
                               if (newUser.user != null) {
@@ -471,6 +482,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                   context,
                                   MaterialPageRoute(builder: (context) {
                                     globals.statusKey = 8;
+                                    putGlobals();
                                     return MainScreen();
                                   }),
                                 );
@@ -500,14 +512,9 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                 email: userEmail,
                                 password: userPassword,
                               );
-                              if (newUser.user != null) {
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(builder: (context) {
-                                //     return MainScreen();
-                                //   }),
-                                // );
+                              putGlobals();
 
+                              if (newUser.user != null) {
                                 setState(() {
                                   showSpinner = false;
                                 });
